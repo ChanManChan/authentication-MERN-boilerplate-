@@ -1,5 +1,6 @@
 const User = require('../models/user');
 const jwt = require('jsonwebtoken');
+const expressJwt = require('express-jwt');
 // sendgrid
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
@@ -132,3 +133,11 @@ exports.signin = (req, res) => {
     });
   });
 };
+
+// express-jwt
+// Middleware that validates JsonWebTokens and sets req.user.
+// This module lets you authenticate HTTP requests using JWT tokens in your Node.js applications.
+exports.requireSignin = expressJwt({
+  secret: process.env.JWT_SECRET
+  // req.user._id
+});
