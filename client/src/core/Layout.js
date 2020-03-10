@@ -38,9 +38,23 @@ const Layout = ({ children, match, history }) => {
         </div>
       ) : (
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <li className='nav-item'>
-            <span className='nav-link'>{isAuth().name}</span>
-          </li>
+          {isAuth().role === 'admin' ? (
+            <li className='nav-item'>
+              <Link to='/admin' className='nav-link' style={isActive('/admin')}>
+                {isAuth().name}
+              </Link>
+            </li>
+          ) : (
+            <li className='nav-item'>
+              <Link
+                to='/private'
+                className='nav-link'
+                style={isActive('/private')}
+              >
+                {isAuth().name}
+              </Link>
+            </li>
+          )}
           <li className='nav-item'>
             <span
               className='nav-link'

@@ -43,7 +43,7 @@ const Signup = () => {
             password: '',
             buttonText: 'Submit'
           });
-        }, 1000);
+        }, 100);
       })
       .catch(error => {
         console.log('SIGNUP ERROR:- ', error.response.data);
