@@ -141,3 +141,23 @@ exports.requireSignin = expressJwt({
   secret: process.env.JWT_SECRET
   // req.user._id
 });
+
+// if you want to apply any admin middleware, we need to make sure we already applied requireSignin, by the time we perform adminMiddleware we need to make sure that we have the authenticated user already.
+// once you apply requireSignin, it will give us the 'req.user' and based on that ID from 'req.user' we can query the database
+exports.adminMiddleware = (req, res, next) => {
+  User.findById({ _id: req.user._id }).exec((err, user) => {
+    if (err || !user) {
+      return res.status(400).json({
+        error: 'User not found'
+      });
+    }
+    if (user.role !== 'admin') {
+      return res.status(400).json({
+        error: 'Admin resource. Access denied.'
+      });
+    }
+    // this user (who is a logged in admin) is now available in the request object by the name of profile so that we can easily access this user's info
+    req.profile = user;
+    next();
+  });
+};

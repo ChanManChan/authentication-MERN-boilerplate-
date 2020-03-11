@@ -67,3 +67,13 @@ export const signout = next => {
   next();
   //   next(); <-- where we can do something like redirect or showing the message or anything
 };
+
+export const updateUser = (response, next) => {
+  console.log('UPDATE USER IN LOCAL STORAGE HELPERS:- ', response);
+  if (typeof window !== undefined) {
+    let auth = JSON.parse(localStorage.getItem('user'));
+    auth = response.data;
+    setLocalStorage('user', auth);
+  }
+  next();
+};
