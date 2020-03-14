@@ -5,6 +5,7 @@ import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
 import { authenticate, isAuth } from './helpers';
+import GoogleLogin from './Google';
 
 const Signin = ({ history }) => {
   const [values, setValues] = useState({
@@ -17,6 +18,15 @@ const Signin = ({ history }) => {
 
   const handleChange = name => event => {
     setValues({ ...values, [name]: event.target.value });
+  };
+
+  // this 'informParent' function, we can pass as props to Google.js(<GoogleLogin />) so that it will be available in the Google component
+  const informParent = response => {
+    authenticate(response, () => {
+      isAuth() && isAuth().role === 'admin'
+        ? history.push('/admin')
+        : history.push('/private');
+    });
   };
 
   const clickSubmit = event => {
@@ -45,7 +55,7 @@ const Signin = ({ history }) => {
               password: '',
               buttonText: 'Submit'
             });
-          }, 100);
+          }, 500);
           isAuth() && isAuth().role === 'admin'
             ? history.push('/admin')
             : history.push('/private');
@@ -95,6 +105,7 @@ const Signin = ({ history }) => {
         {isAuth() ? <Redirect to='/' /> : null}
         {/* {JSON.stringify({ name, email, password })} */}
         <h1 className='p-5 text-center'>Signin</h1>
+        <GoogleLogin informParent={informParent} />
         {signinForm()}
         <br />
         <Link
