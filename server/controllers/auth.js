@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const expressJwt = require('express-jwt');
 const _ = require('lodash');
 const { OAuth2Client } = require('google-auth-library');
+const fetch = require('node-fetch');
 // sendgrid
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
@@ -306,5 +307,57 @@ exports.googleLogin = (req, res) => {
           error: 'Google login failed. Try again'
         });
       }
+    });
+};
+
+exports.facebookLogin = (req, res) => {
+  // we need the userID and accessToken that we are sending from the client side
+  console.log('FACEBOOK LOGIN REQ BODY:- ', req.body);
+  const { userID, accessToken } = req.body;
+  /*when we make request to facebook using valid userID and accessToken that we got from the client side as a result of facebook login and, so when we make request to facebook API using the below URL, with the userID and accessToken, will give us the user profile that we require*/
+  const url = `https://graph.facebook.com/v2.11/${userID}/?fields=id,name,email&access_token=${accessToken}`;
+  return fetch(url, {
+    method: 'GET'
+  })
+    .then(response => response.json())
+    .then(response => {
+      const { email, name } = response;
+      User.findOne({ email }).exec((err, user) => {
+        if (user) {
+          const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
+            expiresIn: '7d'
+          });
+          const { _id, email, name, role } = user;
+          return res.json({
+            token,
+            user: { _id, email, name, role }
+          });
+        } else {
+          // user with this email is not present in our DB therefore sign them up using facebook login
+          let password = email + process.env.JWT_SECRET;
+          user = new User({ name, email, password });
+          user.save((err, data) => {
+            if (err) {
+              console.log('ERROR FACEBOOK LOGIN ON USER SAVE:-', err);
+              return res.status(500).json({
+                error: 'User signup failed with facebook'
+              });
+            }
+            const token = jwt.sign({ _id: data._id }, process.env.JWT_SECRET, {
+              expiresIn: '7d'
+            });
+            const { _id, email, name, role } = data;
+            return res.json({
+              token,
+              user: { _id, email, name, role }
+            });
+          });
+        }
+      });
+    })
+    .catch(error => {
+      res.json({
+        error: 'Facebook login failed. Try later'
+      });
     });
 };

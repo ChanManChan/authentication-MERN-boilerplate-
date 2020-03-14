@@ -6,6 +6,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
 import { authenticate, isAuth } from './helpers';
 import GoogleLogin from './Google';
+import FacebookLogin from './Facebook';
 
 const Signin = ({ history }) => {
   const [values, setValues] = useState({
@@ -106,6 +107,7 @@ const Signin = ({ history }) => {
         {/* {JSON.stringify({ name, email, password })} */}
         <h1 className='p-5 text-center'>Signin</h1>
         <GoogleLogin informParent={informParent} />
+        <FacebookLogin informParent={informParent} />
         {signinForm()}
         <br />
         <Link
