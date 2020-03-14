@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Redirect } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import Layout from '../core/Layout';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
@@ -96,6 +96,13 @@ const Signin = ({ history }) => {
         {/* {JSON.stringify({ name, email, password })} */}
         <h1 className='p-5 text-center'>Signin</h1>
         {signinForm()}
+        <br />
+        <Link
+          to='/auth/password/forgot'
+          className='btn btn-sm btn-outline-danger'
+        >
+          Forgot Password
+        </Link>
       </div>
     </Layout>
   );
